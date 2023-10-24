@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:Schedule_Planner"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="Toolbar" TargetType="StackPanel">
+            <Setter Property="Background" Value="#3A3A3A" />
+        </Style>
+        <Style TargetType="Grid">
+            <Setter Property="Background" Value="#1E1E1E" />
+        </Style>
     </Application.Resources>
 </Application>
