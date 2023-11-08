@@ -4,21 +4,60 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Schedule_Planner"
+        xmlns:self="clr-namespace:Schedule_Planner.GUI"
+        xmlns:core="clr-namespace:Schedule_Planner.Core"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="Schedule Planner" Height="450" Width="800"
         WindowStartupLocation="CenterScreen">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Style="{StaticResource Toolbar}" Grid.ColumnSpan="2">
+        <!-- The left navigation panel -->
+        <Border Style="{StaticResource NavPane}">
+            <StackPanel Margin="8">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 14">
+                    <Button>
+                        New
+                    </Button>
+                    <Button>
+                        Save
+                    </Button>
+                    <Button>
+                        Open
+                    </Button>
+                    <Button>
+                        New Folder
+                    </Button>
+                </StackPanel>
+
+                <TreeView Name="explorer">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type self:Folder}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Resources/folder.png" Height="16" Margin="2 2 6 2"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type core:Schedule}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Resources/schedule.png" Height="16" Margin="2 2 6 2"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.Resources>
+                    
+                </TreeView>
+                
+                
+            </StackPanel>
+        </Border>
+
+        <!-- The main window -->
+        <Grid Grid.Column="1">
             
-        </StackPanel>
+        </Grid>
     </Grid>
 </Window>
