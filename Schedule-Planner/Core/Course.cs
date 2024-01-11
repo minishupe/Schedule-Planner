@@ -85,12 +85,13 @@ class Course
                         Sections.GetValueOrDefault(term).Add(new Lab());
                     }
                 }
+            }
         }
     }
 
-    public AddTerm(int term, IWebDriver driver)
+    public int AddTerm(int term, IWebDriver driver)
     {
-
+            return 0;
     }
 
     /// <summary>
@@ -98,9 +99,9 @@ class Course
     /// Precondition: driver is loaded onto the Timetable with the desired term and subject,
     /// the Sections, Code, and Prefix fields have been initialized.
     /// </summary>
-    private List<ISection> CreateSections(int term, IWebDriver driver)
+    private List<ISection>? CreateSections(int term, IWebDriver driver)
     {
-        
+        return null;
     }
 
 
