@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Schedule_Planner
+namespace Schedule_Planner.GUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

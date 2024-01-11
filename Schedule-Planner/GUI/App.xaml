@@ -1,4 +1,4 @@
-﻿<Application x:Class="Schedule_Planner.App"
+﻿<Application x:Class="Schedule_Planner.GUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Schedule_Planner"
