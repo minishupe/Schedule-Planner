@@ -14,11 +14,11 @@ namespace Schedule_Planner.Core;
 /// </summary>
 class Course
 {
-    public string Prefix { get; init; }
-    public int Code { get; init; }
-    public string Name { get; init; }
-    public int Credits { get; init; }
-    public Dictionary<int, List<ISection>> Sections {  get; set; } // keys are terms, values are associated classes
+    public string Prefix { get; }
+    public int Code { get; }
+    public string Name { get; }
+    public int Credits { get; }
+    public Dictionary<int, List<ISection>> Sections { get; private set; } // keys are terms, values are associated classes
     private static readonly string dataPath = $@"{Environment.ProcessPath}\Data\";
     private const string TimetableUrl = "https://web4u.banner.wwu.edu/pls/wwis/wwskcfnd.TimeTable";
 
@@ -28,7 +28,7 @@ class Course
     /// </summary>
     public Course(string prefix, int code)
     {
-
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -45,15 +45,41 @@ class Course
             Log.Warning($"Unexpected TimeTable title: {driver.Title}");
         }
 
+        // Check to make sure prefix exists:
+        var subjSelector = new SelectElement(driver.FindElement(By.Id("subj")));
+        IList<IWebElement> subjects = subjSelector.Options;
+        bool subjValid = false;
+        foreach (IWebElement subject in subjects)
+        {
+            if (subject.GetAttribute("value") == prefix)
+            {
+                subjValid = true;
+                break;
+            }
+        }
+        if (!subjValid)
+        {
+            Log.Warning($"Given prefix does not exist: {prefix}");
+            throw new ArgumentException($"Given prefix does not exist: {prefix}");
+        }
+
+        // Call CreateSections() to validate term and set the actual sections.
+        bool addSuccess = AddTerm(term, driver);
+
+
+
+
+        /*
         // Check to make sure term and prefix exist:
         // TODO: save terms and subjects locally, only search through selectlist if it doesn't exist locally.
         string? invalidArgs = CheckInvalid(prefix, term.ToString(), driver);
         if (invalidArgs != null)
         {
             Log.Warning($"Given prefix or term does not exist: {invalidArgs}");
-            throw new ArgumentException($"Given prefix or term does not exist: {invalidArgs}", invalidArgs);
+            throw new ArgumentException($"Given prefix or term does not exist: {invalidArgs}");
         }
 
+        // Navigate through timetable and scrape course data:
         var submitButton = driver.FindElement(By.XPath("//input[@value='Submit'"));
         submitButton.Click();
 
@@ -87,21 +113,65 @@ class Course
                 }
             }
         }
+        */
     }
 
-    public int AddTerm(int term, IWebDriver driver)
+
+    /// <summary>
+    /// Adds a term and its corresponding sections to this object's Sections.
+    /// </summary>
+    /// <returns>A boolean denoting whether the term and its sections were successfully added.</returns>
+    public bool AddTerm(int term, IWebDriver driver)
     {
-            return 0;
+        // Load onto timetable and get the subject, if needed:
+        if (driver.Url != TimetableUrl)
+        {
+            driver.Url = TimetableUrl;
+        }
+        // TODO: check if subject is already loaded, skipping this next part.
+        var subjSelector = new SelectElement(driver.FindElement(By.Id("subj")));
+        subjSelector.SelectByValue(Prefix);
+        var submitButton = driver.FindElement(By.XPath("//input[@value='Submit'"));
+        submitButton.Click();
+
+        // Check that the term exists:
+        var termSelector = new SelectElement(driver.FindElement(By.Id("term")));
+        IList<IWebElement> terms = termSelector.Options;
+        bool termValid = false;
+        foreach(IWebElement option in terms)
+        {
+            if (option.GetAttribute("value") == term.ToString())
+            {
+                termValid = true;
+                break;
+            }
+        }
+        if (!termValid)
+        {
+            return false;
+        }
+
+        // Create new section list for the term, creating a new term if necessary:
+        if (Sections == null)
+        {
+            Sections = new Dictionary<int, List<ISection>> { { term, new List<ISection>() } };
+        }
+        else
+        {
+            Sections[term] = new List<ISection>();
+        }
+
+        return CreateSections(term, driver);
     }
 
     /// <summary>
-    /// Returns a list of Section objects relating to the given term.
+    /// Adds a list of sections to the given term
     /// Precondition: driver is loaded onto the Timetable with the desired term and subject,
     /// the Sections, Code, and Prefix fields have been initialized.
     /// </summary>
-    private List<ISection>? CreateSections(int term, IWebDriver driver)
+    private bool CreateSections(int term, IWebDriver driver)
     {
-        return null;
+        
     }
 
 
@@ -109,6 +179,7 @@ class Course
     /// Checks whether a given subject and term exist in the timetable.
     /// Returns: a string denoting the invalid prefix or term, or null if both are valid.
     /// </summary>
+    /*
     private string? CheckInvalid(string prefix, string term, IWebDriver driver)
     {
         var subjSelector = new SelectElement(driver.FindElement(By.Id("subj")));
@@ -149,4 +220,5 @@ class Course
         // term does not exist.
         return term;
     }
+    */
 }
