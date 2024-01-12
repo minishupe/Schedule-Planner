@@ -14,11 +14,12 @@ public class Lecture : ISection
     public int Crn { get; }
     public string Days { get; }
     public TimeSpan Time { get; }
-    public string Instructor { get; set; }
-    public string Room { get; set; }
-    public int[] Seats { get; set; } // formatted: cap, enrolled, available
+    public string Instructor { get; private set; }
+    public string Room { get; private set; }
+    public int[] Seats { get; private set; } // formatted: cap, enrolled
     public string[]? Traits { get; }
-    public float? Rating { get; set; }
+    public float? Rating { get; private set; }
+    public Lab? Lab { get; }
 
 
 }
