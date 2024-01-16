@@ -172,5 +172,8 @@ class Course
         return success;
     }
 
+    public static Course Fetch()
+    {
 
+    }
 }
