@@ -73,7 +73,7 @@ public class TimeBlock
         {
             if (this.EndMinute < other.EndMinute ||  other.EndMinute < this.StartMinute)
             {
-                return true;
+                return false;
             }
         }
         return true;
