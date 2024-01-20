@@ -7,23 +7,14 @@ using System.Threading.Tasks;
 namespace Schedule_Planner.Util;
 
 /// <summary>
-/// A basic utility class for representing a block of time between a defined start and end.
+/// Represents a block of two times, accurate to the minute.
 /// </summary>
-public class TimeBlock
+/// <param name="StartHour">The hour component of the starting time</param>
+/// <param name="StartMinute">The minute component of the starting time</param>
+/// <param name="EndHour">The hour component of the ending time</param>
+/// <param name="EndMinute">The minute component of the ending time</param>
+public readonly record struct TimeBlock(byte StartHour, byte StartMinute, byte EndHour, byte EndMinute)
 {
-    public int StartHour { get; set; }
-    public int StartMinute { get; set; }
-    public int EndHour { get; set; }
-    public int EndMinute { get; set; }
-
-    public TimeBlock(int startHour, int startMinute, int endHour, int endMinute)
-    {
-        this.StartHour = startHour;
-        this.StartMinute = startMinute;
-        this.EndHour = endHour;
-        this.EndMinute = endMinute;
-    }
-    
     /// <summary>
     /// Attempts to parse a string representing a time block.
     /// <para />
@@ -38,9 +29,9 @@ public class TimeBlock
         string designator = str[^2..].ToLower();
         string start = str.Split('-')[0].Trim();
         string end = str.Split('-')[1][..^2].Trim();
-        int startHr = int.Parse(start.Split(':')[0]);
-        int endHr = int.Parse(end.Split(':')[0]);
-        
+        byte startHr = byte.Parse(start.Split(':')[0]);
+        byte endHr = byte.Parse(end.Split(':')[0]);
+
         // Convert pm times into 24-hour format:
         if (designator == "pm")
         {
@@ -56,8 +47,8 @@ public class TimeBlock
             }
         }
 
-        int startMin = int.Parse(start.Split(':')[1]);
-        int endMin = int.Parse(end.Split(':')[1]);
+        byte startMin = byte.Parse(start.Split(':')[1]);
+        byte endMin = byte.Parse(end.Split(':')[1]);
 
         return new TimeBlock(startHr, startMin, endHr, endMin);
     }
@@ -65,13 +56,13 @@ public class TimeBlock
     /// <summary>
     /// Returns whether the current Time Block overlaps in time with another Time Block.
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="other">The object to compare this object with</param>
     /// <returns>True if this objects overlaps with the given object, otherwise false.</returns>
     public bool Overlaps(TimeBlock other)
     {
         if (this.EndHour < other.StartHour || other.EndHour < this.StartHour)
         {
-            if (this.EndMinute < other.EndMinute ||  other.EndMinute < this.StartMinute)
+            if (this.EndMinute < other.EndMinute || other.EndMinute < this.StartMinute)
             {
                 return false;
             }
