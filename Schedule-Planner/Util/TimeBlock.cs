@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Schedule_Planner.Util;
+﻿namespace Schedule_Planner.Util;
 
 /// <summary>
 /// Represents a block of two times, accurate to the minute.
@@ -72,9 +66,9 @@ public readonly record struct TimeBlock(byte StartHour, byte StartMinute, byte E
 
     public override string ToString()
     {
-        // Prints the timeblock as HH:MM XM - HH:MM XM.
+        // Prints the timeblock as "HH:MM XM - HH:MM XM".
         string start;
-        if (StartHour > 12)
+        if (StartHour >= 12)
         {
             start = (StartHour - 12).ToString() + ":" + StartMinute.ToString() + " pm";
         }
@@ -84,7 +78,7 @@ public readonly record struct TimeBlock(byte StartHour, byte StartMinute, byte E
         }
 
         string end;
-        if (EndHour > 12)
+        if (EndHour >= 12)
         {
             end = (EndHour - 12).ToString() + ":" + EndMinute.ToString() + " pm";
         }
