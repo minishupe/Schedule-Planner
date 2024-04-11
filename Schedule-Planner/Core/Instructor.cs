@@ -1,7 +1,7 @@
-﻿using System;
-using Serilog;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using Schedule_Planner.Util;
+using Serilog;
+using System;
 
 namespace Schedule_Planner.Core;
 
@@ -11,10 +11,10 @@ namespace Schedule_Planner.Core;
 public class Instructor
 {
     public string Name { get; }
-    public int Tid { get; private set; }
-    public float? Rating { get; private set; }
-    public float? Difficulty { get; private set; }
-    private static DateOnly LastUpdated { get; set; }
+    public int Tid { get; }
+    public float? Rating { get; set; }
+    public float? Difficulty { get; set; }
+    public DateOnly LastUpdated { get; set; }
     private const string BING = "https://www.bing.com/search?q=ratemyprofessors";
     private const string RESULT_XPATH = "/html/body/div[4]/main/ol/li[@class=\"b_algo\"]";
     private const string RMP = "https://www.ratemyprofessors.com/professor/";
@@ -29,54 +29,61 @@ public class Instructor
     /// <param name="lastUpdated">Date of most recent RMP fetch. Defaults to 
     /// current date if null</param>
     /// <exception cref="ArgumentNullException"></exception>
+
+    public Instructor(string name)
+    {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Tid = 0;
+        Rating = 0;
+        Difficulty = 0;
+        LastUpdated = DateOnly.FromDateTime(DateTime.Now);
+    }
+
+    public Instructor(string name, int tid)
+    {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Tid = tid;
+    }
+
     public Instructor(
         string name,
         int tid,
         float? rating,
         float? difficulty,
-        DateOnly? lastUpdated)
+        DateOnly lastUpdated)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Tid = tid;
         Rating = rating;
         Difficulty = difficulty;
-        if (lastUpdated == null)
-        {
-            LastUpdated = DateOnly.FromDateTime(DateTime.Now);
-        }
-        else
-        {
-            LastUpdated = (DateOnly) lastUpdated;
-        }
+        LastUpdated = lastUpdated;
     }
 
     /// <summary>
-    /// Fetches instructor data from Rate My Professors and converts it into an
-    /// Instructor object.
+    /// Fetches instructor data from Rate My Professors or the Cache and converts
+    /// it into an Instructor object.
     /// </summary>
     /// <returns>
-    /// An Instructor instance or null if the instructor rating wasn't found.
+    /// An Instructor instance. If the instructor is not found, a Staff instructor object
     /// </returns>
-    public static Instructor? Fetch(string firstName, string lastName)
+    public static Instructor? Fetch(string name)
     {
-        // Grabs the first couple of urls from Bing, getting the RMP teacher ID:
-
-        HtmlWeb web = new();
-        var bingResults = web.Load(BING + $"+{firstName}+{lastName}");
-        var resultElements = bingResults.DocumentNode.SelectNodes(RESULT_XPATH);
         string? url = null;
+        if (name != null || name != "Staff") {
 
-        foreach (var result in resultElements)
-        {
+        }
+        HtmlWeb web = new();
+        var bingResults = web.Load(BING + $"+{name}");
+        var resultElements = bingResults.DocumentNode.SelectNodes(RESULT_XPATH);
+
+        foreach (var result in resultElements) {
             var linkElement = result.SelectSingleNode("div[@class=\"b_title\"]/h2/a");
             string title = linkElement.InnerText.ToLower();
-            if (!(title.Contains(firstName) && title.Contains(lastName)))
-            {
+            if (!title.Contains(name)) {
                 continue;  // Title isn't for this professor.
             }
             string href = linkElement.Attributes["href"].Value;
-            if (!(href.Contains("ratemyprofessors.com")))
-            {
+            if (!(href.Contains("ratemyprofessors.com"))) {
                 continue;  // It's not a RMP link.
             }
 
@@ -84,11 +91,10 @@ public class Instructor
             url = href;
         }
 
-        if (url == null)
-        {
+        if (url == null) {
             return null;
         }
-        string name = firstName + " " + lastName;
+        //string name = firstName + " " + lastName;
         int tid = int.Parse(url.Split('/')[^1]);
 
         Instructor instructor = new(name, tid, null, null, null);
@@ -104,9 +110,9 @@ public class Instructor
     public void UpdateRating()
     {
         // TODO: add number of ratings and difficulty to this class.
-        const string INFO_XPATH = 
+        const string INFO_XPATH =
             "//*[@class=\"TeacherInfo__StyledTeacher-ti1fio-1 kFNvIp\"]";
-        const string RATING_XPATH = 
+        const string RATING_XPATH =
             "//div[@class=\"RatingValue__Numerator-qw8sqy-2 liyUjw\"]";
         //const string NUM_RATINGS_XPATH = 
         //    "//div[@class=\"RatingValue__NumRatings-qw8sqy-0 jMkisx\"]";
